@@ -10,7 +10,7 @@ SERP_API_KEY = os.getenv("SERP_API_KEY")
 
 
 @tool
-async def web_search(query: str, num_results: int = 5) -> str:
+def web_search(query: str, num_results: int = 5) -> str:
     """Perform a web search and return consolidated text with top result facts."""
     print(f"Performing web search for query: {query} with top {num_results} results.")
     response = requests.get(
