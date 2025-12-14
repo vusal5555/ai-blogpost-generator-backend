@@ -3,12 +3,20 @@ from langchain.chat_models import init_chat_model
 from state import State
 import sys
 import os
+from supabase import create_client
+import uuid
+
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from tools.web_search_tool import web_search
 
 
 load_dotenv()
+
+supabase = create_client(
+    os.getenv("PUBLIC_SUPABASE_URL"),
+    os.getenv("PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY"),
+)
 
 
 llm = init_chat_model("claude-sonnet-4-5-20250929")
@@ -18,6 +26,7 @@ llm_with_tools = llm.bind_tools([web_search])
 
 def research_agent(state: State):
     print("Research Agent Invoked")
+    run_id = state.get("run_id") or str(uuid.uuid4())
     last_message = state["messages"][-1]
 
     messages = [
@@ -55,6 +64,15 @@ def research_agent(state: State):
     else:
         # No tool calls, use the direct response
         research_notes = reply.content
+
+    supabase.table("agent-logs").insert(
+        {
+            "run_id": run_id,
+            "agent": "researcher",
+            "input": last_message.content,
+            "output": research_notes,
+        }
+    ).execute()
 
     return {
         "research_notes": research_notes,

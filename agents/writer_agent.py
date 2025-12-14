@@ -1,6 +1,12 @@
 from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
 from state import State
+from subapase_client import supabase
+import uuid
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 
 load_dotenv()
@@ -15,6 +21,7 @@ def writer_agent(state: State):
     research = state.get("research_notes", "")
     issues = state.get("fact_check_issues", "")
     draft = state.get("draft", "")
+    run_id = state.get("run_id") or str(uuid.uuid4())
     if issues:
         messages = [
             {
@@ -43,6 +50,16 @@ def writer_agent(state: State):
     ]
 
     reply = llm.invoke(messages)
+
+    supabase.table("agent-logs").insert(
+        {
+            "run_id": run_id,
+            "agent": "writer_agent",
+            "input": last_message.content,
+            "output": reply.content,
+        }
+    ).execute()
+
     return {
         "draft": reply.content,
         "messages": [{"role": "assistant", "content": reply.content}],

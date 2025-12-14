@@ -5,6 +5,7 @@ from writer_agent import writer_agent
 from fack_checker_agent import fact_checker_agent
 from polisher_agent import polisher_agent
 from routers.fack_checker_router import fact_check_router
+from langgraph.store.memory import InMemoryStore
 
 
 graph_builder = StateGraph(State)
@@ -30,6 +31,7 @@ graph_builder.add_node(
     polisher_agent,
 )
 
+# store = InMemoryStore()
 
 graph_builder.add_edge(START, "research_agent")
 
@@ -53,5 +55,6 @@ state = orchestrater.invoke(
         "retry_count": 0,
     }
 )
+
 
 print(state.get("final_post", "No final post generated"))
