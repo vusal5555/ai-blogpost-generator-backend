@@ -5,6 +5,7 @@ from typing_extensions import TypedDict, Optional
 
 class State(TypedDict):
     messages: Annotated[list, add_messages]
+    run_id: Optional[str]
     research_notes: Optional[str]
     draft: Optional[str]
     fact_check_passed: Optional[bool]

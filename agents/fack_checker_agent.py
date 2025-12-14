@@ -1,6 +1,12 @@
 from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
 from state import State
+from subapase_client import supabase
+import uuid
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 
 load_dotenv()
@@ -13,6 +19,8 @@ def fact_checker_agent(state: State):
     draft = state.get("draft", "")
     research_notes = state.get("research_notes", "")
     retry_count = state.get("retry_count", 0)
+    last_message = state["messages"][-1]
+    run_id = state.get("run_id") or str(uuid.uuid4())
 
     print("Fact Checker Agent Invoked")
 
@@ -41,6 +49,15 @@ def fact_checker_agent(state: State):
             ],
         }
     else:
+        supabase.table("agent-logs").insert(
+            {
+                "run_id": run_id,
+                "agent": "fact_checker_agent",
+                "input": last_message.content,
+                "output": reply.content,
+            }
+        ).execute()
+
         return {
             "fact_check_passed": False,
             "fact_check_issues": issues,
