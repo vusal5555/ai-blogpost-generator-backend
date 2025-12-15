@@ -1,12 +1,8 @@
 from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
-from state import State
+from agents.state import State
 from subapase_client import supabase
 import uuid
-import sys
-import os
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 
 load_dotenv()

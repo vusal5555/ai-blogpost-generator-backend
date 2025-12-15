@@ -1,13 +1,10 @@
 from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
-from state import State
-import sys
+from agents.state import State
 import os
 from supabase import create_client
 import uuid
 
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from tools.web_search_tool import web_search
 
 

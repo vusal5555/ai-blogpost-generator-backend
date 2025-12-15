@@ -1,12 +1,11 @@
 from langgraph.graph import StateGraph, START, END
-from research_agent import research_agent
-from state import State
-from writer_agent import writer_agent
-from fack_checker_agent import fact_checker_agent
-from polisher_agent import polisher_agent
+from agents.research_agent import research_agent
+from agents.state import State
+from agents.writer_agent import writer_agent
+from agents.fack_checker_agent import fact_checker_agent
+from agents.polisher_agent import polisher_agent
 from routers.fack_checker_router import fact_check_router
 from langgraph.store.memory import InMemoryStore
-import uuid
 
 
 graph_builder = StateGraph(State)

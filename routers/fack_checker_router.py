@@ -1,9 +1,5 @@
 from typing import Literal
-import sys
-import os
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from state import State
+from agents.state import State
 
 
 def fact_check_router(state: State) -> Literal["polisher_agent", "writer_agent"]:
