@@ -14,6 +14,11 @@ llm = init_chat_model("claude-sonnet-4-5-20250929")
 def writer_agent(state: State):
     print("Writer Agent Invoked")
     last_message = state["messages"][-1]
+    message_content = (
+        last_message.content
+        if hasattr(last_message, "content")
+        else last_message["content"]
+    )
     research = state.get("research_notes", "")
     issues = state.get("fact_check_issues", "")
     draft = state.get("draft", "")
@@ -30,7 +35,7 @@ def writer_agent(state: State):
             {issues}
             """,
             },
-            {"role": "user", "content": last_message.content},
+            {"role": "user", "content": message_content},
         ]
         research += f"\n\nPlease address the following issues found during fact-checking:\n{issues}"
     messages = [
@@ -42,7 +47,7 @@ def writer_agent(state: State):
             {research}
             """,
         },
-        {"role": "user", "content": last_message.content},
+        {"role": "user", "content": message_content},
     ]
 
     reply = llm.invoke(messages)
@@ -51,7 +56,7 @@ def writer_agent(state: State):
         {
             "run_id": run_id,
             "agent": "writer_agent",
-            "input": last_message.content,
+            "input": message_content,
             "output": reply.content,
         }
     ).execute()

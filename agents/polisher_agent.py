@@ -16,6 +16,11 @@ def polisher_agent(state: State):
     run_id = state.get("run_id") or str(uuid.uuid4())
     draft = state.get("draft", "")
     last_message = state["messages"][-1]
+    message_content = (
+        last_message.content
+        if hasattr(last_message, "content")
+        else last_message["content"]
+    )
     messages = [
         {
             "role": "system",
@@ -30,7 +35,7 @@ def polisher_agent(state: State):
         {
             "run_id": run_id,
             "agent": "polisher_agent",
-            "input": last_message.content,
+            "input": message_content,
             "output": reply.content,
         }
     ).execute()

@@ -61,7 +61,7 @@ def generate_content(request: GenerateRequest):
             {
                 "run_id": state.get("run_id"),
                 "final_post": state.get("final_post", "No final post generated"),
-                "prd_content": state.get("messages")[0]["content"],
+                "prd_content": request.prd_content,
                 "research_notes": state.get("research_notes", ""),
                 "fact_check_passed": state.get("fact_check_passed", False),
                 "draft": state.get("draft", ""),

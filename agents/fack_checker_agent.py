@@ -16,6 +16,11 @@ def fact_checker_agent(state: State):
     research_notes = state.get("research_notes", "")
     retry_count = state.get("retry_count", 0)
     last_message = state["messages"][-1]
+    message_content = (
+        last_message.content
+        if hasattr(last_message, "content")
+        else last_message["content"]
+    )
     run_id = state.get("run_id") or str(uuid.uuid4())
 
     print("Fact Checker Agent Invoked")
@@ -49,7 +54,7 @@ def fact_checker_agent(state: State):
             {
                 "run_id": run_id,
                 "agent": "fact_checker_agent",
-                "input": last_message.content,
+                "input": message_content,
                 "output": reply.content,
             }
         ).execute()

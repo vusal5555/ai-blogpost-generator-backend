@@ -25,13 +25,18 @@ def research_agent(state: State):
     print("Research Agent Invoked")
     run_id = state.get("run_id") or str(uuid.uuid4())
     last_message = state["messages"][-1]
+    message_content = (
+        last_message.content
+        if hasattr(last_message, "content")
+        else last_message["content"]
+    )
 
     messages = [
         {
             "role": "system",
             "content": """You are a research agent. Your task is to help users by providing well-researched and accurate information based on their queries. Use the web_search tool to find reliable sources and ensure that your responses are clear and concise.""",
         },
-        {"role": "user", "content": last_message.content},
+        {"role": "user", "content": message_content},
     ]
 
     reply = llm_with_tools.invoke(messages)
@@ -41,8 +46,16 @@ def research_agent(state: State):
         # Execute each tool call
         tool_results = []
         for tool_call in reply.tool_calls:
-            if tool_call["name"] == "web_search":
-                result = web_search.invoke(tool_call["args"])
+
+            tool_name = (
+                tool_call["name"] if isinstance(tool_call, dict) else tool_call.name
+            )
+            tool_args = (
+                tool_call["args"] if isinstance(tool_call, dict) else tool_call.args
+            )
+
+            if tool_name == "web_search":
+                result = web_search.invoke(tool_args)
                 tool_results.append(result)
 
         # Combine tool results into research notes
@@ -66,7 +79,7 @@ def research_agent(state: State):
         {
             "run_id": run_id,
             "agent": "researcher",
-            "input": last_message.content,
+            "input": message_content,
             "output": research_notes,
         }
     ).execute()
