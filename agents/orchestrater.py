@@ -31,7 +31,6 @@ graph_builder.add_node(
     polisher_agent,
 )
 
-# store = InMemoryStore()
 
 graph_builder.add_edge(START, "research_agent")
 
@@ -42,20 +41,3 @@ graph_builder.add_edge("polisher_agent", END)
 
 
 orchestrater = graph_builder.compile()
-# run_id = str(uuid.uuid4())
-
-# state = orchestrater.invoke(
-#     {
-#         "messages": [
-#             {
-#                 "role": "user",
-#                 "content": "What are the latest advancements in renewable energy?",
-#             }
-#         ],
-#         "run_id": run_id,
-#         "retry_count": 0,
-#     }
-# )
-
-
-# print(state.get("final_post", "No final post generated"))
