@@ -1,4 +1,5 @@
-from typing import Union
+from typing import List, Union
+from unittest import result
 from pydantic import BaseModel
 from agents.orchestrater import orchestrater
 import sys
@@ -29,6 +30,19 @@ class GenerateResponse(BaseModel):
     draft: str
     fact_check_passed: bool
     retry_count: int
+
+
+class LogResponse(BaseModel):
+    run_id: str
+    agent: str
+    input: str
+    output: str
+    metadata: Union[dict, None] = None
+    created_at: str
+
+
+class LogsListResponse(BaseModel):
+    logs: List[LogResponse]
 
 
 app = FastAPI()
@@ -90,6 +104,28 @@ def generate_content(request: GenerateRequest):
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Error generating content: {str(e)}"
+        )
+
+
+@app.get("/api/runs/{run_id}/logs", response_model=LogsListResponse)
+def get_status(run_id: str):
+    try:
+        response = (
+            supabase.table("agent-logs").select("*").eq("run_id", run_id).execute()
+        )
+        data = response.data
+        if not data:
+            raise HTTPException(
+                status_code=404, detail=f"No logs found for run_id: {run_id}"
+            )
+
+        logs = [LogResponse(**item) for item in data]
+
+        return LogsListResponse(logs=logs)
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Error retrieving status: {str(e)}"
         )
 
 
