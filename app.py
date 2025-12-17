@@ -33,6 +33,7 @@ class GenerateResponse(BaseModel):
 
 
 class LogResponse(BaseModel):
+    id: int
     run_id: str
     agent: str
     input: str
@@ -41,8 +42,24 @@ class LogResponse(BaseModel):
     created_at: str
 
 
+class PostResponse(BaseModel):
+    id: int
+    run_id: str
+    final_post: str
+    prd_content: str
+    research_notes: str
+    fact_check_passed: bool
+    draft: str
+    retry_count: int
+    created_at: str
+
+
 class LogsListResponse(BaseModel):
     logs: List[LogResponse]
+
+
+class PostsListResponse(BaseModel):
+    posts: List[PostResponse]
 
 
 app = FastAPI()
@@ -127,6 +144,24 @@ def get_status(run_id: str):
         raise HTTPException(
             status_code=500, detail=f"Error retrieving status: {str(e)}"
         )
+
+
+@app.get("/api/posts/{run_id}", response_model=PostsListResponse)
+def get_post(run_id: str):
+    try:
+        response = supabase.table("posts").select("*").eq("run_id", run_id).execute()
+        data = response.data
+        if not data:
+            raise HTTPException(
+                status_code=404, detail=f"No post found for run_id: {run_id}"
+            )
+
+        posts = [PostResponse(**item) for item in data]
+
+        return PostsListResponse(posts=posts)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving post: {str(e)}")
 
 
 if __name__ == "__main__":
