@@ -33,7 +33,6 @@ class GenerateResponse(BaseModel):
 
 
 class LogResponse(BaseModel):
-    id: int
     run_id: str
     agent: str
     input: str
@@ -43,7 +42,7 @@ class LogResponse(BaseModel):
 
 
 class PostResponse(BaseModel):
-    id: int
+    id: str
     run_id: str
     final_post: str
     prd_content: str
@@ -162,6 +161,22 @@ def get_post(run_id: str):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error retrieving post: {str(e)}")
+
+
+@app.get("/api/posts", response_model=PostsListResponse)
+def get_all_posts():
+    try:
+        response = supabase.table("posts").select("*").execute()
+        data = response.data
+        if not data:
+            return PostsListResponse(posts=[])
+
+        posts = [PostResponse(**item) for item in data]
+
+        return PostsListResponse(posts=posts)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving posts: {str(e)}")
 
 
 if __name__ == "__main__":
