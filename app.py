@@ -1,5 +1,4 @@
-from typing import List, Union
-from unittest import result
+from typing import List, Optional, Union
 from pydantic import BaseModel
 from agents.orchestrater import orchestrater
 import sys
@@ -21,6 +20,7 @@ from fastapi import FastAPI, HTTPException
 
 class GenerateRequest(BaseModel):
     prd_content: str
+    original_run_id: Optional[str] = None
 
 
 class GenerateResponse(BaseModel):
@@ -83,6 +83,8 @@ def generate_content(request: GenerateRequest):
     try:
 
         run_id = str(uuid.uuid4())
+
+        is_regeneration = request.original_run_id is not None
         state = orchestrater.invoke(
             {
                 "messages": [
@@ -105,6 +107,8 @@ def generate_content(request: GenerateRequest):
                 "fact_check_passed": state.get("fact_check_passed", False),
                 "draft": state.get("draft", ""),
                 "retry_count": state.get("retry_count", 0),
+                "original_run_id": request.original_run_id,
+                "is_regeneration": is_regeneration,
             }
         ).execute()
 
