@@ -67,7 +67,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
-        "https://ai-blogpost-generator-frontend.vercel.app/",
+        "https://ai-blogpost-generator-frontend.vercel.app",  # ← No trailing slash
         "https://*.vercel.app",
     ],
     allow_credentials=True,
