@@ -10,5 +10,6 @@ class State(TypedDict):
     draft: Optional[str]
     fact_check_passed: Optional[bool]
     fact_check_issues: Optional[str]
+    should_retry: Optional[bool]  # New field
     final_post: Optional[str]
     retry_count: int

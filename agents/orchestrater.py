@@ -5,7 +5,6 @@ from agents.writer_agent import writer_agent
 from agents.fack_checker_agent import fact_checker_agent
 from agents.polisher_agent import polisher_agent
 from routers.fack_checker_router import fact_check_router
-from langgraph.store.memory import InMemoryStore
 
 
 graph_builder = StateGraph(State)
