@@ -1,3 +1,5 @@
+import logging
+
 from typing import List, Optional, Union
 from pydantic import BaseModel
 from agents.orchestrater import orchestrater
@@ -7,6 +9,7 @@ import uuid
 import sys
 import os
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import HTTPException as FastAPIHTTPException
 
 # Add the backend directory to Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -67,8 +70,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
-        "https://ai-blogpost-generator-frontend.vercel.app",  # ← No trailing slash
-        "https://*.vercel.app",
+        "https://ai-blogpost-generator-frontend.vercel.app",  # ← No trailing
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -162,11 +164,11 @@ def get_post(run_id: str):
             raise HTTPException(
                 status_code=404, detail=f"No post found for run_id: {run_id}"
             )
-
         posts = [PostResponse(**item) for item in data]
-
         return PostsListResponse(posts=posts)
 
+    except FastAPIHTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error retrieving post: {str(e)}")
 
